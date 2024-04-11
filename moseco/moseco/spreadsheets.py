@@ -97,26 +97,24 @@ def spreadsheet_update_values(service, spreadsheet_id, data=None,
                 ).replace(tzinfo=MOSCOW) + dt.timedelta(hours=1)
             ):
                 empty_line = DataFrame(
-                    {
-                        pollutant: [data.index[0] - dt.timedelta(hours=1)] if (
-                            pollutant == 'datetime'
-                        ) else None for pollutant in (
-                            ['datetime'] + table_values[0][1:]
-                        )
-                    },
+                    [[data.index[0] - dt.timedelta(hours=1), *[None]*(len(data.columns))]],
+                    columns=['datetime', *data.columns]
                 )
                 empty_line = empty_line.set_index('datetime')
                 data = concat([empty_line, data])
                 empty_counter += 1
             if empty_counter:
+                print(len(table_values))
+                print(len(table_values) + empty_counter)
+                print(data.shape[1] - 1)
                 REQUESTS.append({
                     'repeatCell': {
                         'range': {
                             'sheetId': spreadsheet_id,
-                            'startRowIndex': len(table_values[:][0]),
-                            'endRowIndex': len(table_values[:][0]) + empty_counter,
+                            'startRowIndex': len(table_values),
+                            'endRowIndex': len(table_values) + empty_counter,
                             'startColumnIndex': 0,
-                            'endColumnIndex': data.shape[0] - 1,
+                            'endColumnIndex': data.shape[1] - 1,
                         },
                         'cell': {
                             'userEnteredFormat': {
