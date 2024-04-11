@@ -1,5 +1,5 @@
 google-api-python-client==2.77.0
-pandas==1.5.3
+pandas
 python-dotenv==0.21.1
-python-telegram-bot==13.15
+# python-telegram-bot==13.15
 Scrapy==2.8.0

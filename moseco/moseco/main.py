@@ -7,7 +7,7 @@ from time import sleep
 
 from dotenv import load_dotenv
 # from telegram import Bot
-from telegram.error import TelegramError
+# from telegram.error import TelegramError
 
 # try:
 #     from services import MOSCOW
