@@ -1,4 +1,4 @@
-import datetime as dt
+# import datetime as dt
 import logging
 from os import getenv
 from subprocess import PIPE, Popen
@@ -6,8 +6,13 @@ from sys import stdout
 from time import sleep
 
 from dotenv import load_dotenv
-from telegram import Bot
+# from telegram import Bot
 from telegram.error import TelegramError
+
+# try:
+#     from services import MOSCOW
+# except ModuleNotFoundError:
+#     from .services import MOSCOW
 
 load_dotenv()
 
@@ -39,30 +44,35 @@ def send_message(bot, message):
         logging.error('Сбой при отправке сообщения')
 
 
+# All bot logic is commented
 def main():
     """Main logic of a bot."""
-    bot = Bot(token=TELEGRAM_TOKEN)
-    counter = 1
+    # bot = Bot(token=TELEGRAM_TOKEN)
+    # counter = 1
     while True:
         logging.info('Ready to crawl again')
-        _, err = Popen(['scrapy', 'crawl', 'moseco'], stderr=PIPE, text=True,
-                       encoding='utf-8').communicate()
-        if err:
-            message = err.split('\n')[-2]
-            logging.error(message)
-            send_message(
-                bot, f'Сбой в работе программы. Последняя ошибка:\n{message}'
-            )
-        logging.info('Everything is crawled')
-        sleep(RETRY_TIME)
-        current_datetime = dt.datetime.now()
-        if current_datetime.hour in BOT_MESSAGE_TIMES:
-            message = (f'Cводка за текущий период: {counter} раз(a) '
-                       'пауки делали свое дело.')
-            send_message(bot, message)
-            counter = 1
-        else:
-            counter += 1
+        try:
+            _, err = Popen(['scrapy', 'crawl', 'moseco'], stderr=PIPE,
+                           text=True, encoding='utf-8').communicate()
+            if err:
+                message = err.split('\n')[-2]
+                logging.error(err)
+                # send_message(
+                #     bot,
+                #      f'Сбой в работе программы. Последняя ошибка:\n{message}'
+                # )
+            logging.info('Everything is crawled')
+            sleep(RETRY_TIME)
+            # current_datetime = dt.datetime.now(MOSCOW)
+            # if current_datetime.hour in BOT_MESSAGE_TIMES:
+            #     message = (f'Cводка за текущий период: {counter} раз(a) '
+            #                'пауки делали свое дело.')
+            #     send_message(bot, message)
+            #     counter = 1
+            # else:
+            #     counter += 1
+        except Exception:
+            pass
 
 
 if __name__ == '__main__':

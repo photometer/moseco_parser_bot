@@ -1,11 +1,13 @@
 import argparse
 import datetime as dt
 
+from pandas import concat, DataFrame
+
 try:
-    from .services import (DRIVE_SERVICE, EMAIL_USER, REQUESTS, SHEETS,
+    from .services import (DRIVE_SERVICE, EMAIL_USER, MOSCOW, REQUESTS, SHEETS,
                            SHEETS_SERVICE, STATIONS)
-except ModuleNotFoundError:
-    from services import (DRIVE_SERVICE, EMAIL_USER, REQUESTS, SHEETS,
+except (ModuleNotFoundError, ImportError):
+    from services import (DRIVE_SERVICE, EMAIL_USER, MOSCOW, REQUESTS, SHEETS,
                           SHEETS_SERVICE, SPREADSHEET_ID, STATIONS)
 
 FORMAT = '%d.%m.%Y %H:%M'
@@ -81,10 +83,56 @@ def spreadsheet_update_values(service, spreadsheet_id, data=None,
             while (
                 data.index.values.any()
             ) and (
-                data.index[0] <= dt.datetime.strptime(table_values[-1][0],
-                                                      FORMAT)
+                data.index[0] <= dt.datetime.strptime(
+                    table_values[-1][0], FORMAT
+                ).replace(tzinfo=MOSCOW)
             ):
                 data = data.drop(index=data.index[0])
+            empty_counter = 0
+            while (
+                data.index.values.any()
+            ) and (
+                data.index[0] > dt.datetime.strptime(
+                    table_values[-1][0], FORMAT
+                ).replace(tzinfo=MOSCOW) + dt.timedelta(hours=1)
+            ):
+                print(data.index[0] - dt.datetime.strptime(
+                    table_values[-1][0], FORMAT
+                ).replace(tzinfo=MOSCOW))
+                empty_line = DataFrame(
+                    {
+                        pollutant: [data.index[0] - dt.timedelta(hours=1)] if (
+                            pollutant == 'datetime'
+                        ) else None for pollutant in (
+                            ['datetime'] + table_values[0][1:]
+                        )
+                    },
+                )
+                empty_line = empty_line.set_index('datetime')
+                data = concat([empty_line, data])
+                empty_counter += 1
+            if empty_counter:
+                REQUESTS.append({
+                    'repeatCell': {
+                        'range': {
+                            'sheetId': spreadsheet_id,
+                            'startRowIndex': len(table_values),
+                            'endRowIndex': len(table_values) + empty_counter,
+                            'startColumnIndex': 0,
+                            'endColumnIndex': data.shape[1] - 1,
+                        },
+                        'cell': {
+                            'userEnteredFormat': {
+                                'backgroundColor': {'red': 1,
+                                                    'green': 0,
+                                                    'blue': 0}
+                            }
+                        },
+                        'fields': (
+                            'userEnteredFormat(backgroundColor, textFormat)'
+                        )
+                    },
+                })
         data = data.fillna('').reset_index()
         data['datetime'] = list(map(
             lambda x: x.strftime(FORMAT), data['datetime']

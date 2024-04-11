@@ -1,8 +1,11 @@
 import os
 
+import pytz
 from dotenv import load_dotenv
 from google.oauth2.service_account import Credentials
 from googleapiclient import discovery
+
+MOSCOW = pytz.timezone('Europe/Moscow')
 
 SCOPES = [
     'https://www.googleapis.com/auth/spreadsheets',

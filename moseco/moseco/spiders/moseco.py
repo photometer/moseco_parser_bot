@@ -6,10 +6,10 @@ import scrapy
 
 try:
     from items import MosecoItem
-    from services import PARAMETERS, STATIONS
+    from services import MOSCOW, PARAMETERS, STATIONS
 except ModuleNotFoundError:
     from ..items import MosecoItem
-    from ..services import PARAMETERS, STATIONS
+    from ..services import MOSCOW, PARAMETERS, STATIONS
 
 
 class MosecoSpider(scrapy.Spider):
@@ -40,7 +40,7 @@ class MosecoSpider(scrapy.Spider):
                 data['datetime_concentration']['datetime'] = list(map(
                     lambda x: (
                         dt.datetime.fromtimestamp(
-                            x / 1000
+                            x / 1000, tz=MOSCOW
                         ) + dt.timedelta(hours=-3)
                     ),
                     data['datetime_concentration']['datetime']
