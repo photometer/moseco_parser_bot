@@ -96,9 +96,6 @@ def spreadsheet_update_values(service, spreadsheet_id, data=None,
                     table_values[-1][0], FORMAT
                 ).replace(tzinfo=MOSCOW) + dt.timedelta(hours=1)
             ):
-                print(data.index[0] - dt.datetime.strptime(
-                    table_values[-1][0], FORMAT
-                ).replace(tzinfo=MOSCOW))
                 empty_line = DataFrame(
                     {
                         pollutant: [data.index[0] - dt.timedelta(hours=1)] if (
@@ -116,8 +113,8 @@ def spreadsheet_update_values(service, spreadsheet_id, data=None,
                     'repeatCell': {
                         'range': {
                             'sheetId': spreadsheet_id,
-                            'startRowIndex': len(table_values),
-                            'endRowIndex': len(table_values) + empty_counter,
+                            'startRowIndex': len(table_values[:][0]),
+                            'endRowIndex': len(table_values[:][0]) + empty_counter,
                             'startColumnIndex': 0,
                             'endColumnIndex': data.shape[1] - 1,
                         },
