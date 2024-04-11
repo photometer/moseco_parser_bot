@@ -116,7 +116,7 @@ def spreadsheet_update_values(service, spreadsheet_id, data=None,
                             'startRowIndex': len(table_values[:][0]),
                             'endRowIndex': len(table_values[:][0]) + empty_counter,
                             'startColumnIndex': 0,
-                            'endColumnIndex': data.shape[1] - 1,
+                            'endColumnIndex': data.shape[1] - 2,
                         },
                         'cell': {
                             'userEnteredFormat': {
