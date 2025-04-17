@@ -36,7 +36,7 @@ It is a parser that collects hourly data on PM<sub>10</sub>, PM<sub>2.5</sub>, N
 
         ```bash
         python -m venv venv
-        source venv/scripts/activate
+        . venv/Scripts/activate
         ```
 
 - In venv upgrade package manager `pip` and install requirements (Windows):
